@@ -1,4 +1,4 @@
-<div id="matevida-facil">
+<div id="matevida-animado">
     <div class="header-game">
         <span id="score">Puntos: 0</span>
         <span id="progress">Reto: 1 / 15</span>
@@ -13,21 +13,36 @@
     </div>
 
     <div id="challenge-area">
-        <p id="instruction">¡Nivel Intermedio Amistoso! Lanza los dados.</p>
+        <p id="instruction">¡Nivel Intermedio! Lanza los dados para ver el movimiento.</p>
         <div class="input-group">
             <input type="number" id="answer" placeholder="?">
             <button onclick="checkResult()" id="btn-check" disabled>Validar</button>
         </div>
     </div>
 
-    <button onclick="startTurn()" id="btn-roll">Lanzar Dados 🎲</button>
+    <button onclick="animateDice()" id="btn-roll">Lanzar Dados 🎲</button>
     <button onclick="resetGame()" id="btn-reset" class="hidden">Jugar de Nuevo 🔄</button>
     
     <p id="msg"></p>
 </div>
 
 <style>
-    #matevida-facil {
+    /* Estilos base y Animación */
+    @keyframes shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        40% { transform: translate(3px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        80% { transform: translate(3px, 1px) rotate(-1deg); }
+        100% { transform: translate(1px, -2px) rotate(1deg); }
+    }
+
+    .shaking {
+        animation: shake 0.5s;
+        animation-iteration-count: infinite;
+    }
+
+    #matevida-animado {
         background: #ffffff;
         border: 4px solid #ffd700;
         border-radius: 20px;
@@ -40,9 +55,9 @@
     .header-game { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px; }
     .dice-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 20px 0; }
     .dice {
-        width: 60px; height: 60px; background: #2196F3; color: white;
-        font-size: 28px; line-height: 60px; border-radius: 10px;
-        box-shadow: 0 4px #1565C0; font-weight: bold;
+        width: 65px; height: 65px; background: #2196F3; color: white;
+        font-size: 30px; line-height: 65px; border-radius: 12px;
+        box-shadow: 0 5px #1565C0; font-weight: bold;
     }
     .op-sign { font-size: 24px; font-weight: bold; color: #555; }
     input { padding: 10px; width: 90px; font-size: 20px; border-radius: 8px; border: 2px solid #ccc; text-align: center; }
@@ -69,24 +84,34 @@
         window.speechSynthesis.speak(speech);
     }
 
+    // Nueva función para animar y luego ejecutar el turno
+    function animateDice() {
+        const diceElements = document.querySelectorAll('.dice');
+        diceElements.forEach(d => d.classList.add('shaking'));
+        document.getElementById('btn-roll').disabled = true;
+        document.getElementById('msg').innerText = "Lanzando...";
+
+        setTimeout(() => {
+            diceElements.forEach(d => d.classList.remove('shaking'));
+            startTurn();
+        }, 800); // Duración de la animación en milisegundos
+    }
+
     function startTurn() {
         document.getElementById('msg').innerText = "";
-        
-        // Números pequeños (1-10) para facilitar el cálculo mental
         n1 = Math.floor(Math.random() * 9) + 1;
         n2 = Math.floor(Math.random() * 5) + 1;
-        n3 = (currentExercise <= 7) ? 2 : 3; // Multiplicadores fáciles (2 y 3)
+        n3 = (currentExercise <= 7) ? 2 : 3;
 
         document.getElementById('d1').innerText = n1;
         document.getElementById('d2').innerText = n2;
         document.getElementById('d3').innerText = n3;
 
         result = (n1 + n2) * n3;
-        let instructionText = `Suma ${n1} más ${n2} y el resultado multiplícalo por ${n3}`;
+        let instructionText = `Suma ${n1} más ${n2} y multiplica por ${n3}`;
 
         document.getElementById('instruction').innerText = `Reto ${currentExercise}: (${n1} + ${n2}) x ${n3}`;
         document.getElementById('btn-check').disabled = false;
-        document.getElementById('btn-roll').disabled = true;
         document.getElementById('answer').focus();
         speak(instructionText);
     }
@@ -97,8 +122,8 @@
         if(userAns === result) {
             score += 150;
             document.getElementById('msg').style.color = "green";
-            document.getElementById('msg').innerText = "¡Muy bien! Sigue así.";
-            speak("¡Excelente respuesta!");
+            document.getElementById('msg').innerText = "¡Excelente!";
+            speak("¡Correcto!");
             
             if(currentExercise < totalExercises) {
                 currentExercise++;
@@ -110,19 +135,19 @@
             }
         } else {
             document.getElementById('msg').style.color = "red";
-            document.getElementById('msg').innerText = "Prueba otra vez, tú puedes";
-            speak("Casi lo logras, intenta de nuevo.");
+            document.getElementById('msg').innerText = "Intenta de nuevo";
+            speak("Revisa tu cálculo.");
         }
         document.getElementById('score').innerText = `Puntos: ${score}`;
         document.getElementById('answer').value = "";
     }
 
     function endGame() {
-        document.getElementById('instruction').innerHTML = "<h3>¡FELICIDADES, LO LOGRASTE! ✨</h3>";
+        document.getElementById('instruction').innerHTML = "<h3>🏆 ¡RETO COMPLETADO! 🏆</h3>";
         document.getElementById('btn-roll').classList.add('hidden');
         document.getElementById('btn-check').classList.add('hidden');
         document.getElementById('btn-reset').classList.remove('hidden');
-        speak(`¡Buen trabajo! Completaste los 15 retos con ${score} puntos.`);
+        speak(`¡Felicidades! Lograste ${score} puntos en los 15 retos.`);
     }
 
     function resetGame() {
