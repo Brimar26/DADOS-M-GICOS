@@ -1,3 +1,4 @@
+
 <div id="matevida-game">
     <div class="header-game">
         <span id="score">Puntos: 0</span>
