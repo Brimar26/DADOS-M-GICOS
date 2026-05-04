@@ -1,17 +1,19 @@
-<div id="matevida-game-hard">
+<div id="matevida-facil">
     <div class="header-game">
         <span id="score">Puntos: 0</span>
         <span id="progress">Reto: 1 / 15</span>
     </div>
 
     <div class="dice-container">
-        <div id="dado1" class="dice">?</div>
-        <div id="dado2" class="dice">?</div>
-        <div id="dado3" class="dice" style="background:#E91E63;">?</div>
+        <div id="d1" class="dice">?</div>
+        <div class="op-sign">+</div>
+        <div id="d2" class="dice">?</div>
+        <div class="op-sign">x</div>
+        <div id="d3" class="dice" style="background:#4CAF50;">2</div>
     </div>
 
     <div id="challenge-area">
-        <p id="instruction">¡Nivel Difícil Activado! Lanza los dados.</p>
+        <p id="instruction">¡Nivel Intermedio Amistoso! Lanza los dados.</p>
         <div class="input-group">
             <input type="number" id="answer" placeholder="?">
             <button onclick="checkResult()" id="btn-check" disabled>Validar</button>
@@ -19,13 +21,13 @@
     </div>
 
     <button onclick="startTurn()" id="btn-roll">Lanzar Dados 🎲</button>
-    <button onclick="resetGame()" id="btn-reset" class="hidden">Reiniciar Desafío 🔄</button>
+    <button onclick="resetGame()" id="btn-reset" class="hidden">Jugar de Nuevo 🔄</button>
     
     <p id="msg"></p>
 </div>
 
 <style>
-    #matevida-game-hard {
+    #matevida-facil {
         background: #ffffff;
         border: 4px solid #ffd700;
         border-radius: 20px;
@@ -34,19 +36,19 @@
         margin: 20px auto;
         text-align: center;
         font-family: 'Arial', sans-serif;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
-    .header-game { display: flex; justify-content: space-between; font-weight: bold; color: #2c3e50; margin-bottom: 15px; }
-    .dice-container { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+    .header-game { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px; }
+    .dice-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 20px 0; }
     .dice {
-        width: 65px; height: 65px; background: #2196F3; color: white;
-        font-size: 30px; line-height: 65px; border-radius: 12px;
-        box-shadow: 0 5px #1565C0; font-weight: bold;
+        width: 60px; height: 60px; background: #2196F3; color: white;
+        font-size: 28px; line-height: 60px; border-radius: 10px;
+        box-shadow: 0 4px #1565C0; font-weight: bold;
     }
-    input { padding: 10px; width: 100px; font-size: 20px; border-radius: 8px; border: 2px solid #ccc; text-align: center; }
+    .op-sign { font-size: 24px; font-weight: bold; color: #555; }
+    input { padding: 10px; width: 90px; font-size: 20px; border-radius: 8px; border: 2px solid #ccc; text-align: center; }
     button {
         padding: 12px 25px; font-size: 16px; border: none; border-radius: 8px;
-        cursor: pointer; font-weight: bold; transition: 0.2s; margin: 5px;
+        cursor: pointer; font-weight: bold; margin: 5px;
     }
     #btn-roll { background: #4CAF50; color: white; }
     #btn-check { background: #ffd700; color: #333; }
@@ -69,49 +71,34 @@
 
     function startTurn() {
         document.getElementById('msg').innerText = "";
-        n1 = Math.floor(Math.random() * 20) + 10; // Números más grandes (10-30)
-        n2 = Math.floor(Math.random() * 15) + 5;
-        n3 = Math.floor(Math.random() * 5) + 2;
-
-        document.getElementById('dado1').innerText = n1;
-        document.getElementById('dado2').innerText = n2;
-        document.getElementById('dado3').innerText = n3;
-
-        let instructionText = "";
         
-        if (currentExercise <= 5) {
-            // Operaciones combinadas: (A + B) x C
-            result = (n1 + n2) * n3;
-            instructionText = `¿Cuánto es (${n1} + ${n2}) x ${n3}?`;
-        } else if (currentExercise <= 10) {
-            // Jerarquía: A x B - C
-            result = (n1 * n3) - n2;
-            instructionText = `¿Cuánto es ${n1} x ${n3} - ${n2}?`;
-        } else {
-            // Potencias básicas: A² + B
-            n1 = Math.floor(Math.random() * 10) + 2;
-            document.getElementById('dado1').innerText = n1;
-            document.getElementById('dado2').innerText = "²";
-            document.getElementById('dado3').innerText = n2;
-            result = Math.pow(n1, 2) + n2;
-            instructionText = `¿Cuánto es ${n1} al cuadrado más ${n2}?`;
-        }
+        // Números pequeños (1-10) para facilitar el cálculo mental
+        n1 = Math.floor(Math.random() * 9) + 1;
+        n2 = Math.floor(Math.random() * 5) + 1;
+        n3 = (currentExercise <= 7) ? 2 : 3; // Multiplicadores fáciles (2 y 3)
 
-        document.getElementById('instruction').innerText = `Reto ${currentExercise}: ${instructionText}`;
+        document.getElementById('d1').innerText = n1;
+        document.getElementById('d2').innerText = n2;
+        document.getElementById('d3').innerText = n3;
+
+        result = (n1 + n2) * n3;
+        let instructionText = `Suma ${n1} más ${n2} y el resultado multiplícalo por ${n3}`;
+
+        document.getElementById('instruction').innerText = `Reto ${currentExercise}: (${n1} + ${n2}) x ${n3}`;
         document.getElementById('btn-check').disabled = false;
         document.getElementById('btn-roll').disabled = true;
         document.getElementById('answer').focus();
-        speak(`Reto ${currentExercise}. ${instructionText}`);
+        speak(instructionText);
     }
 
     function checkResult() {
         let userAns = parseInt(document.getElementById('answer').value);
         
         if(userAns === result) {
-            score += 250; // Más puntos por dificultad
+            score += 150;
             document.getElementById('msg').style.color = "green";
-            document.getElementById('msg').innerText = "¡Nivel Experto! +250 puntos";
-            speak("¡Excelente razonamiento!");
+            document.getElementById('msg').innerText = "¡Muy bien! Sigue así.";
+            speak("¡Excelente respuesta!");
             
             if(currentExercise < totalExercises) {
                 currentExercise++;
@@ -123,19 +110,19 @@
             }
         } else {
             document.getElementById('msg').style.color = "red";
-            document.getElementById('msg').innerText = "Revisa la jerarquía de operaciones";
-            speak("Analiza bien el orden de las operaciones.");
+            document.getElementById('msg').innerText = "Prueba otra vez, tú puedes";
+            speak("Casi lo logras, intenta de nuevo.");
         }
         document.getElementById('score').innerText = `Puntos: ${score}`;
         document.getElementById('answer').value = "";
     }
 
     function endGame() {
-        document.getElementById('instruction').innerHTML = "<h3>🏆 ¡MAESTRO DE LAS MATEMÁTICAS! 🏆</h3>";
+        document.getElementById('instruction').innerHTML = "<h3>¡FELICIDADES, LO LOGRASTE! ✨</h3>";
         document.getElementById('btn-roll').classList.add('hidden');
         document.getElementById('btn-check').classList.add('hidden');
         document.getElementById('btn-reset').classList.remove('hidden');
-        speak(`Increíble. Has superado el nivel difícil con ${score} puntos.`);
+        speak(`¡Buen trabajo! Completaste los 15 retos con ${score} puntos.`);
     }
 
     function resetGame() {
@@ -146,10 +133,9 @@
         document.getElementById('btn-roll').disabled = false;
         document.getElementById('btn-check').classList.remove('hidden');
         document.getElementById('btn-reset').classList.add('hidden');
-        document.getElementById('instruction').innerText = "¡Nivel Difícil Activado! Lanza los dados.";
-        document.getElementById('dado1').innerText = "?";
-        document.getElementById('dado2').innerText = "?";
-        document.getElementById('dado3').innerText = "?";
+        document.getElementById('instruction').innerText = "¡Lanza los dados!";
+        document.getElementById('d1').innerText = "?";
+        document.getElementById('d2').innerText = "?";
         document.getElementById('msg').innerText = "";
     }
 </script>
